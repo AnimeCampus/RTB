@@ -529,15 +529,11 @@ async def ping_handler(bot: Update, msg: Message):
     uptime_seconds = int(current_time - bot_start_time)
     uptime_minutes, uptime_seconds = divmod(uptime_seconds, 60)
     uptime_hours, uptime_minutes = divmod(uptime_minutes, 60)
-    uptime_days, uptime_hours = divmod(uptime_hours, 24)
-
-    # Count the number of requests in the database
-    total_requests = collection_ID.count_documents({})
+    uptime_days, uptime_hours = divmod(uptime_hours, 24)   
 
     uptime_message = (
-        f"🤖 Bot Uptime: {uptime_days} days, {uptime_hours} hours, {uptime_minutes} minutes, {uptime_seconds} seconds\n"
+        f"🤖 Bot Uptime: {uptime_days} days, {uptime_hours} hours, {uptime_minutes} minutes, {uptime_seconds} seconds\n"      
         
-        f"📥 Total Requests: {total_requests}"
     )
 
     await msg.reply_text(uptime_message)

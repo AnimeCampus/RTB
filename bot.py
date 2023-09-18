@@ -105,7 +105,7 @@ async def forwardedHandler(bot:Update, msg:Message):
     return
 
 # /add handler to add group id & channel id with database
-@bot.on(events.NewMessage(pattern='/add'))
+@app.on(events.NewMessage(pattern='/add'))
 async def groupChannelIDHandler(event: events.NewMessage.Event):
     # Check if the user is an admin
     if not await is_admin(event.sender_id):
@@ -204,7 +204,7 @@ async def groupChannelIDHandler(event: events.NewMessage.Event):
     return
 
 # /remove handler to remove group id & channel id with database
-@bot.on(events.NewMessage(pattern='/remove'))
+@app.on(events.NewMessage(pattern='/remove'))
 async def groupChannelIDHandler(event: events.NewMessage.Event):
     # Check if the user is an admin
     if not await is_admin(event.sender_id):

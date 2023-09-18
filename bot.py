@@ -25,6 +25,12 @@ from pyrogram.errors.exceptions.bad_request_400 import (
 from pymongo import MongoClient
 import requests
 from pyrogram.errors import MediaEmpty, BadRequest
+import json
+from urllib.parse import quote_plus
+from collections import Counter
+from bs4 import BeautifulSoup
+from unidecode import unidecode
+
 
 
 
@@ -33,6 +39,8 @@ try:
     from testexp.config import *
 except ModuleNotFoundError:
     from config import *
+
+from config import BOT_TOKEN as bot_token
 
 # Importing built-in module
 from re import match, search
@@ -509,6 +517,103 @@ async def callBackButton(bot:Update, callback_query:CallbackQuery):
                     return
     return
 
+
+# Configuration
+SUPPORT_CHAT = "NanoSTestingArea"
+
+# Sauce Function
+async def Sauce(bot_token, file_id):
+    r = requests.post(f'https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}').json()
+    file_path = r['result']['file_path']
+    headers = {'User-agent': 'Mozilla/5.0 (Linux; Android 6.0.1; SM-G920V Build/MMB29K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.98 Mobile Safari/537.36'}
+    to_parse = f"https://lens.google.com/uploadbyurl?url=https://api.telegram.org/file/bot{bot_token}/{file_path}"
+    r = requests.get(to_parse, headers=headers)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    script_elements = soup.find_all('script')
+    
+    for script in script_elements:
+        if 'Visual matches' in script.text:
+            raw_data = script.text
+            break
+    else:
+        return False
+    
+    try:
+        start = raw_data.index('data:') + 5
+        end = raw_data.index('sideChannel', start) - 2
+        json_data = json.loads(raw_data[start:end])
+        product_list = []
+        
+        for product in json_data:
+            information = {
+                'google_image': product[0][0],
+                'title': product[3],
+                'redirect_url': product[5],
+                'redirect_name': product[14],
+            }
+            product_list.append(information)
+        
+        if product_list:
+            most_common_product = product_list[0]
+            title = most_common_product['title']
+            redirect_url = most_common_product['redirect_url']
+            return {"title": title, "url": redirect_url}
+        else:
+            return False
+    
+    except Exception as e:
+        print("An error occurred:", e)
+        return False
+
+# Get File ID from Message Function
+async def get_file_id_from_message(msg):
+    message = msg.reply_to_message
+    
+    if not message or not message.media:
+        return None
+    
+    media = message.media
+    
+    if media.file_size and int(media.file_size) > 3145728:
+        return None
+    
+    if media.mime_type not in ("image/png", "image/jpeg"):
+        return None
+    
+    if hasattr(media, "document"):
+        file_id = media.document.file_id
+    elif hasattr(media, "sticker"):
+        if media.sticker.is_animated and not media.sticker.thumbs:
+            return None
+        file_id = media.sticker.thumbs[0].file_id if media.sticker.is_animated else media.sticker.file_id
+    elif hasattr(media, "photo"):
+        file_id = media.photo.file_id
+    elif hasattr(media, "animation") and media.animation.thumbs:
+        file_id = media.animation.thumbs[0].file_id
+    elif hasattr(media, "video") and media.video.thumbs:
+        file_id = media.video.thumbs[0].file_id
+    else:
+        return None
+    
+    return file_id
+
+
+# Command Handling
+@app.on_message(filters.text & filters.command(["pp", "grs", "reverse", "p", "po"]))
+async def _reverse(_, msg):
+    text = await msg.reply("**⇢ wait a sec...**")
+    file_id = await get_file_id_from_message(msg)
+    
+    if not file_id:
+        return await text.edit("**reply to media!**")
+    
+    await text.edit("**⇢ Requesting to Google....**")
+    result = await Sauce(BOT_TOKEN, file_id)
+    
+    if not result:
+        return await text.edit(f"**API DOWN : @{SUPPORT_CHAT}**")
+    
+    await text.edit('**Result ⇢** `{}`'.format(result['title']), disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Site", url=result['url'])]]))
 
 """Bot is Started"""
 print("Bot has been Started!!!")

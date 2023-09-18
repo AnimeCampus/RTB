@@ -40,8 +40,6 @@ try:
 except ModuleNotFoundError:
     from config import *
 
-from config import BOT_TOKEN as bot_token
-
 # Importing built-in module
 from re import match, search
 

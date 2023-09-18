@@ -105,7 +105,8 @@ async def help_handler(bot: Update, msg: Message):
     /add GroupID ChannelID - Add your Group and Channel IDs to the bot's database.
     /remove GroupID - Remove your Group and Channel IDs from the bot's database.
     /imdb MovieName - Search for a movie on IMDb.
-    
+    /donate - Donate some money.
+  
     <b>How to Use:</b>
     1. Add the bot to your Group and Channel.
     2. Make the bot admin in both the Channel and Group.
@@ -569,6 +570,21 @@ async def say_goodbye_to_members(bot: Update, msg: Message):
     goodbye_message = f"Goodbye, {user_name}! 👋"
     await bot.send_message(group_id, goodbye_message)
 
+# Define the /donate command handler
+@app.on_message(filters.command("donate"))
+async def donate_handler(bot: Update, msg: Message):
+    # You can customize the image URL and caption here
+    image_url = "https://example.com/donation_image.jpg"
+    caption = "Donate to support the owner! 💰\n\nYou can contribute to our project and help us grow. Your support is greatly appreciated. 🙏"
+
+    # Create an InputMediaPhoto object with the image URL and caption
+    media = InputMediaPhoto(
+        media=image_url,
+        caption=caption,
+    )
+
+    # Reply to the /donate command with the image and caption
+    await msg.reply_media(media)
 
 
 """Bot is Started"""

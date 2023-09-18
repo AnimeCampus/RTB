@@ -577,7 +577,7 @@ async def start_handler(bot: Update, msg: Message):
     botInfo = await bot.get_me()
     await bot.send_photo(
         chat_id=msg.chat.id,
-        dphoto="https://graph.org/file/d7b10ac38976f8032ea60.jpg", 
+        photo="https://graph.org/file/d7b10ac38976f8032ea60.jpg", 
         caption="<b>Donate Some Money To More Service</b>",
         parse_mode="html",
         reply_markup=InlineKeyboardMarkup(

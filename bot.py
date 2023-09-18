@@ -49,11 +49,11 @@ db_bot = mongo_client['RequestTrackerBot']
 collection_ID = db_bot['channelGroupID']
 
 '''Admin'''
-admin_ids = [1852823985]
+NANO = [1852823985]
 
 # Check if the user is an admin
 async def is_admin(user_id):
-    return user_id in admin_ids
+    return user_id in NANO
 
 # Regular Expression for #request
 requestRegex = "#[rR][eE][qQ][uU][eE][sS][tT] "
@@ -107,9 +107,9 @@ async def forwardedHandler(bot:Update, msg:Message):
 # /add handler to add group id & channel id with database
 @app.on_message(filters.command("add"))
 async def groupChannelIDHandler(bot: Client, msg: Message):
-    if msg.from_user.id not in admin_ids:
+    if msg.from_user.id not in NANO:
         await msg.reply_text(
-            "<b>You are not authorized to use this command.</b>",
+            "<b>You are not authorized to use this command. Contact: @SexyNano</b>",
             parse_mode="html"
         )
         return
@@ -206,9 +206,9 @@ async def groupChannelIDHandler(bot: Client, msg: Message):
 # /remove handler to remove group id & channel id from database
 @app.on_message(filters.command("remove"))
 async def channelgroupRemover(bot: Client, msg: Message):
-    if msg.from_user.id not in admin_ids:
+    if msg.from_user.id not in NANO:
         await msg.reply_text(
-            "<b>You are not authorized to use this command.</b>",
+            "<b>You are not authorized to use this command. Contact: @SexyNano</b>",
             parse_mode="html"
         )
         return

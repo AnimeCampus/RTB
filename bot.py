@@ -30,9 +30,12 @@ from urllib.parse import quote_plus
 from collections import Counter
 from bs4 import BeautifulSoup
 from unidecode import unidecode
-
-from typing import List
-
+from typing import BinaryIO, Dict, List
+import time
+import os
+from uuid import uuid4
+import httpx
+from pyrogram.enums import MessageMediaType
 
 # Importing Credentials & Required Data
 try:

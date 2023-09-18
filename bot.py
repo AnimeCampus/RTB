@@ -522,8 +522,6 @@ import time
 # Define a global variable to store the bot's start time
 bot_start_time = time.time()
 
-# ... (Your existing code here)
-
 # /ping command handler
 @app.on_message(filters.group & filters.command("ping"))
 async def ping_handler(bot: Update, msg: Message):

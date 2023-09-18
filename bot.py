@@ -105,11 +105,11 @@ async def forwardedHandler(bot:Update, msg:Message):
     return
 
 # /add handler to add group id & channel id with database
-@app.on_message(filters.private & filters.command("add"))
-async def groupChannelIDHandler(bot: Update, msg: Message):
+@bot.on(events.NewMessage(pattern='/add'))
+async def groupChannelIDHandler(event: events.NewMessage.Event):
     # Check if the user is an admin
-    if msg.from_id not in admin_ids:
-        await msg.reply_text(
+    if not await is_admin(event.sender_id):
+        await event.reply(
             "<b>Only authorized admins can use this command.</b>",
             parse_mode="html"
         )
@@ -203,12 +203,12 @@ async def groupChannelIDHandler(bot: Update, msg: Message):
         )
     return
 
-# /remove handler to remove group id & channel id from database
-@app.on_message(filters.private & filters.command("remove"))
-async def channelgroupRemover(bot: Update, msg: Message):
+# /remove handler to remove group id & channel id with database
+@bot.on(events.NewMessage(pattern='/remove'))
+async def groupChannelIDHandler(event: events.NewMessage.Event):
     # Check if the user is an admin
-    if not await is_admin(msg.from_id):
-        await msg.reply_text(
+    if not await is_admin(event.sender_id):
+        await event.reply(
             "<b>Only authorized admins can use this command.</b>",
             parse_mode="html"
         )

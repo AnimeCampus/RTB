@@ -48,6 +48,12 @@ mongo_client = MongoClient(Config.MONGO_STR)
 db_bot = mongo_client['RequestTrackerBot']
 collection_ID = db_bot['channelGroupID']
 
+'''Admin'''
+admin_ids = [123456789, 987654321]
+
+# Check if the user is an admin
+async def is_admin(user_id):
+    return user_id in admin_ids
 
 # Regular Expression for #request
 requestRegex = "#[rR][eE][qQ][uU][eE][sS][tT] "
@@ -100,7 +106,14 @@ async def forwardedHandler(bot:Update, msg:Message):
 
 # /add handler to add group id & channel id with database
 @app.on_message(filters.private & filters.command("add"))
-async def groupChannelIDHandler(bot:Update, msg:Message):
+async def groupChannelIDHandler(bot: Update, msg: Message):
+    # Check if the user is an admin
+    if msg.from_id not in admin_ids:
+        await msg.reply_text(
+            "<b>Only authorized admins can use this command.</b>",
+            parse_mode="html"
+        )
+        return
     message = msg.text.split(" ")
     if len(message) == 3:   # If command is valid
         _, groupID, channelID = message
@@ -192,7 +205,14 @@ async def groupChannelIDHandler(bot:Update, msg:Message):
 
 # /remove handler to remove group id & channel id from database
 @app.on_message(filters.private & filters.command("remove"))
-async def channelgroupRemover(bot:Update, msg:Message):
+async def channelgroupRemover(bot: Update, msg: Message):
+    # Check if the user is an admin
+    if not await is_admin(msg.from_id):
+        await msg.reply_text(
+            "<b>Only authorized admins can use this command.</b>",
+            parse_mode="html"
+        )
+        return
     message = msg.text.split(" ")
     if len(message) == 2:   # If command is valid
         _, groupID = message

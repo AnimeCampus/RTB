@@ -49,7 +49,7 @@ db_bot = mongo_client['RequestTrackerBot']
 collection_ID = db_bot['channelGroupID']
 
 '''Admin'''
-admin_ids = [123456789, 987654321]
+admin_ids = [1852823985]
 
 # Check if the user is an admin
 async def is_admin(user_id):

@@ -538,6 +538,7 @@ async def ping_handler(bot: Update, msg: Message):
 
     uptime_message = (
         f"🤖 Bot Uptime: {uptime_days} days, {uptime_hours} hours, {uptime_minutes} minutes, {uptime_seconds} seconds\n"
+        
         f"📥 Total Requests: {total_requests}"
     )
 
@@ -574,7 +575,7 @@ async def say_goodbye_to_members(bot: Update, msg: Message):
 @app.on_message(filters.command("donate"))
 async def donate_handler(bot: Update, msg: Message):
     # You can customize the image URL and caption here
-    image_url = "https://example.com/donation_image.jpg"
+    image_url = "https://graph.org/file/d7b10ac38976f8032ea60.jpg"
     caption = "Donate to support the owner! 💰\n\nYou can contribute to our project and help us grow. Your support is greatly appreciated. 🙏"
 
     # Create an InputMediaPhoto object with the image URL and caption

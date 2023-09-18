@@ -573,19 +573,24 @@ async def say_goodbye_to_members(bot: Update, msg: Message):
 
 # Define the /donate command handler
 @app.on_message(filters.command("donate"))
-async def donate_handler(bot: Update, msg: Message):
-    # You can customize the image URL and caption here
-    image_url = "https://graph.org/file/d7b10ac38976f8032ea60.jpg"
-    caption = "Donate to support the owner! 💰\n\nYou can contribute to our project and help us grow. Your support is greatly appreciated. 🙏"
-
-    # Create an InputMediaPhoto object with the image URL and caption
-    media = InputMediaPhoto(
-        media=image_url,
-        caption=caption,
+async def start_handler(bot: Update, msg: Message):
+    botInfo = await bot.get_me()
+    await bot.send_photo(
+        chat_id=msg.chat.id,
+        photo="https://graph.org/file/80a46dfbbc510295212ae.jpg", 
+        caption="<b>Donate Some Money To More Service</b>",
+        parse_mode="html",
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        "Owner",
+                        url=f"https://telegram.me/SexyNano"
+                    )
+                ]
+            ]
+        ),
     )
-
-    # Reply to the /donate command with the image and caption
-    await msg.reply_media(media)
 
 
 """Bot is Started"""

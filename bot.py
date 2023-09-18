@@ -516,7 +516,60 @@ async def callBackButton(bot:Update, callback_query:CallbackQuery):
                             parse_mode = "html"
                         )
                     return
-    return
+import time
+
+# Define a global variable to store the bot's start time
+bot_start_time = time.time()
+
+# ... (Your existing code here)
+
+# /ping command handler
+@app.on_message(filters.group & filters.command("ping"))
+async def ping_handler(bot: Update, msg: Message):
+    current_time = time.time()
+    uptime_seconds = int(current_time - bot_start_time)
+    uptime_minutes, uptime_seconds = divmod(uptime_seconds, 60)
+    uptime_hours, uptime_minutes = divmod(uptime_minutes, 60)
+    uptime_days, uptime_hours = divmod(uptime_hours, 24)
+
+    # Count the number of requests in the database
+    total_requests = collection_ID.count_documents({})
+
+    uptime_message = (
+        f"🤖 Bot Uptime: {uptime_days} days, {uptime_hours} hours, {uptime_minutes} minutes, {uptime_seconds} seconds\n"
+        f"📥 Total Requests: {total_requests}"
+    )
+
+    await msg.reply_text(uptime_message)
+
+@app.on_message(filters.group & filters.new_chat_members)
+async def welcome_new_members(bot: Update, msg: Message):
+    new_members = msg.new_chat_members
+    group_id = msg.chat.id
+
+    for member in new_members:
+        if member.is_bot:
+            continue  # Skip welcoming other bots
+        user_id = member.id
+        user_name = member.first_name if member.first_name else "New Member"
+
+        welcome_message = f"Welcome {user_name} to the group! 🎉"
+        await bot.send_message(group_id, welcome_message)
+
+@app.on_message(filters.group & filters.left_chat_member)
+async def say_goodbye_to_members(bot: Update, msg: Message):
+    member = msg.left_chat_member
+    group_id = msg.chat.id
+
+    if member.is_bot:
+        return  # Skip saying goodbye to bots
+
+    user_id = member.id
+    user_name = member.first_name if member.first_name else "Member"
+
+    goodbye_message = f"Goodbye, {user_name}! 👋"
+    await bot.send_message(group_id, goodbye_message)
+
 
 
 """Bot is Started"""

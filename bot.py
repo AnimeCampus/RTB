@@ -550,7 +550,6 @@ async def welcome_new_members(bot: Update, msg: Message):
     for member in new_members:
         if member.is_bot:
             continue  # Skip welcoming other bots
-        user_id = member.id
         user_name = member.first_name if member.first_name else "New Member"
 
         welcome_message = f"Welcome {user_name} to the group! 🎉"

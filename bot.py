@@ -65,14 +65,14 @@ requestRegex = "#[rR][eE][qQ][uU][eE][sS][tT] "
 
 """Handlers""" 
 
-# Start & Help Handler
-@app.on_message(filters.private & filters.command(["start", "help"]))
-async def startHandler(bot: Update, msg: Message):
+# Start Handler
+@app.on_message(filters.private & filters.command("start"))
+async def start_handler(bot: Update, msg: Message):
     botInfo = await bot.get_me()
     await bot.send_photo(
         chat_id=msg.chat.id,
         photo="https://graph.org/file/80a46dfbbc510295212ae.jpg", 
-        caption="<b>Hi, I am Request Tracker Bot🤖.\nIf you hadn't added me in your Group & Channel then ➕add me now.\n\nHow to Use me?</b>\n\t1. Add me to your Group & Channel.\n\t2. Make me admin in both Channel & Group.\n\t3. Give permission to Post, Edit & Delete Messages.\n\t4. Now send Group ID & Channel ID in this format <code>/add GroupID ChannelID</code>.\nNow Bot is ready to be used.\n\n<b>😊Join @AJPyroVerse & @AJPyroVerseGroup for getting more awesome 🤖bots like this.</b>",
+        caption="<b>Hi, I am Request Tracker Bot🤖.\nIf you haven't added me to your Group & Channel yet, ➕add me now.\n\nHow to Use me?</b>\n\t1. Add me to your Group & Channel.\n\t2. Make me admin in both the Channel & Group.\n\t3. Give me permission to Post, Edit & Delete Messages.\n\t4. Now send Group ID & Channel ID in this format <code>/add GroupID ChannelID</code>.\nNow the Bot is ready to be used.\n\n<b>😊Join @AJPyroVerse & @AJPyroVerseGroup for more awesome 🤖bots like this.</b>",
         parse_mode="html",
         reply_markup=InlineKeyboardMarkup(
             [
@@ -85,7 +85,35 @@ async def startHandler(bot: Update, msg: Message):
             ]
         ),
     )
-    return
+
+# Help Handler
+@app.on_message(filters.private & filters.command("help"))
+async def help_handler(bot: Update, msg: Message):
+    help_message = """
+    <b>Commands:</b>
+    /start - Start using the bot.
+    /help - Get help and usage instructions.
+    /add GroupID ChannelID - Add your Group and Channel IDs to the bot's database.
+    /remove GroupID - Remove your Group and Channel IDs from the bot's database.
+    /imdb MovieName - Search for a movie on IMDb.
+    
+    <b>How to Use:</b>
+    1. Add the bot to your Group and Channel.
+    2. Make the bot admin in both the Channel and Group.
+    3. Give the bot permission to Post, Edit, and Delete Messages.
+    4. Use /add to add your GroupID and ChannelID to the bot.
+    5. Use /remove to remove your GroupID and ChannelID from the bot.
+    6. Use /imdb followed by a movie name to search for movies on IMDb.
+    
+    <b>😊Join @NanoSTestingArea for more awesome 🤖bots like this.</b>
+    """
+
+    await bot.send_message(
+        chat_id=msg.chat.id,
+        text=help_message,
+        parse_mode="html",
+    )
+
 
 # return group id when bot is added to group
 @app.on_message(filters.new_chat_members)

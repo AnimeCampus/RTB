@@ -575,7 +575,7 @@ async def say_goodbye_to_members(bot: Update, msg: Message):
 @app.on_message(filters.command("donate"))
 async def start_handler(bot: Update, msg: Message):
     botInfo = await bot.get_me()
-    await bot.send_dphoto(
+    await bot.send_photo(
         chat_id=msg.chat.id,
         dphoto="https://graph.org/file/d7b10ac38976f8032ea60.jpg", 
         caption="<b>Donate Some Money To More Service</b>",

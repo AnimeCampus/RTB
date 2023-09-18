@@ -61,7 +61,7 @@ async def startHandler(bot: Update, msg: Message):
     botInfo = await bot.get_me()
     await bot.send_photo(
         chat_id=msg.chat.id,
-        photo="https://your_image_url_here.jpg", 
+        photo="https://graph.org/file/80a46dfbbc510295212ae.jpg", 
         caption="<b>Hi, I am Request Tracker Bot🤖.\nIf you hadn't added me in your Group & Channel then ➕add me now.\n\nHow to Use me?</b>\n\t1. Add me to your Group & Channel.\n\t2. Make me admin in both Channel & Group.\n\t3. Give permission to Post, Edit & Delete Messages.\n\t4. Now send Group ID & Channel ID in this format <code>/add GroupID ChannelID</code>.\nNow Bot is ready to be used.\n\n<b>😊Join @AJPyroVerse & @AJPyroVerseGroup for getting more awesome 🤖bots like this.</b>",
         parse_mode="html",
         reply_markup=InlineKeyboardMarkup(

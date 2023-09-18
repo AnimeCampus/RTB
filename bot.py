@@ -35,7 +35,7 @@ import time
 import os
 from uuid import uuid4
 import httpx
-# from pyrogram.enums import MessageMediaType
+from pyrogram.enums import MessageMediaType
 
 # Importing Credentials & Required Data
 try:

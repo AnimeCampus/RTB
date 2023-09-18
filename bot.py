@@ -31,7 +31,7 @@ from collections import Counter
 from bs4 import BeautifulSoup
 from unidecode import unidecode
 
-
+from typing import List
 
 
 # Importing Credentials & Required Data

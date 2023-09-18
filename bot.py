@@ -516,102 +516,88 @@ async def callBackButton(bot:Update, callback_query:CallbackQuery):
     return
 
 
-# Configuration
-SUPPORT_CHAT = "NanoSTestingArea"
+API_URL: str = "https://sasta-api.vercel.app/google_reverse"
 
-# Sauce Function
-async def Sauce(bot_token, file_id):
-    r = requests.post(f'https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}').json()
-    file_path = r['result']['file_path']
-    headers = {'User-agent': 'Mozilla/5.0 (Linux; Android 6.0.1; SM-G920V Build/MMB29K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.98 Mobile Safari/537.36'}
-    to_parse = f"https://lens.google.com/uploadbyurl?url=https://api.telegram.org/file/bot{bot_token}/{file_path}"
-    r = requests.get(to_parse, headers=headers)
-    soup = BeautifulSoup(r.text, 'html.parser')
-    script_elements = soup.find_all('script')
+COMMANDS: List[str] = [
+    "reverse",
+    "grs",
+    "pp"
+    ]
+
+async_client: httpx.AsyncClient = httpx.AsyncClient(timeout=120)
+
+class STRINGS:
+    REPLY_TO_MEDIA: str = "ℹ️ Please reply to a media types, such as a photo, sticker, or image file."
+    UNSUPPORTED_MEDIA_TYPE: str = "⚠️ <b>Unsupported media type!</b>\nℹ️ Please reply with a supported media type: image, sticker, or image file."
     
-    for script in script_elements:
-        if 'Visual matches' in script.text:
-            raw_data = script.text
-            break
-    else:
-        return False
+    DOWNLOADING_MEDIA: str = "⏳ Downloading media..."
+    UPLOADING_TO_API_SERVER: str = "📡 Uploading media to <b>Google Server</b>... 📶"
+    PARSING_RESULT: str = "💻 Parsing result..."
     
+    EXCEPTION_OCCURRED: str = "❌ <b>Exception occurred!</b>\n\n<b>Exception:</b> {}"
+    
+    RESULT: str = """
+🔤 <b>Result:</b> <code>{query}</code>
+    """
+    OPEN_PAGE: str = "↗️ Open Page"
+
+@app.on_message(filters.command(COMMANDS))
+async def on_reverse(client: Client, message: Message) -> None:
+    if not message.reply_to_message:
+        await message.reply(STRINGS.REPLY_TO_MEDIA)
+        return
+    elif message.reply_to_message.media not in (MessageMediaType.PHOTO, MessageMediaType.STICKER, MessageMediaType.DOCUMENT):
+        await message.reply(STRINGS.UNSUPPORTED_MEDIA_TYPE)
+        return
+    
+    start_time: float = time.time()
+    status_msg: Message = await message.reply(STRINGS.DOWNLOADING_MEDIA)
+    file_path: str = f"temp_download/{uuid4()}"
     try:
-        start = raw_data.index('data:') + 5
-        end = raw_data.index('sideChannel', start) - 2
-        json_data = json.loads(raw_data[start:end])
-        product_list = []
-        
-        for product in json_data:
-            information = {
-                'google_image': product[0][0],
-                'title': product[3],
-                'redirect_url': product[5],
-                'redirect_name': product[14],
-            }
-            product_list.append(information)
-        
-        if product_list:
-            most_common_product = product_list[0]
-            title = most_common_product['title']
-            redirect_url = most_common_product['redirect_url']
-            return {"title": title, "url": redirect_url}
-        else:
-            return False
+        await message.reply_to_message.download(file_path)
+    except Exception as exc:
+        text: str = STRINGS.EXCEPTION_OCCURRED.format(exc)
+        await message.reply(text)
+        try:
+            os.remove(file_path)
+        except FileNotFoundError:
+            pass
+        return
     
-    except Exception as e:
-        print("An error occurred:", e)
-        return False
-
-# Get File ID from Message Function
-async def get_file_id_from_message(msg):
-    message = msg.reply_to_message
+    await status_msg.edit(STRINGS.UPLOADING_TO_API_SERVER)
+    files: Dict[str, BinaryIO] = {"file": open(file_path, "rb")}
+    response: httpx.Response = await async_client.post(API_URL, files=files)
+    os.remove(file_path)
     
-    if not message or not message.media:
-        return None
+    if response.status_code == 404:
+        text: str = STRINGS.EXCEPTION_OCCURRED.format(response.json()["error"])
+        await message.reply(text)
+        await status_msg.delete()
+        return
+    elif response.status_code != 200:
+        text: str = STRINGS.EXCEPTION_OCCURRED.format(response.text)
+        await message.reply(text)
+        await status_msg.delete()
+        return
     
-    media = message.media
+    await status_msg.edit(STRINGS.PARSING_RESULT)
+    response_json: Dict[str, str] = response.json()
+    query: str = response_json["query"]
+    page_url: str = response_json["url"]
     
-    if media.file_size and int(media.file_size) > 3145728:
-        return None
+    end_time: float = time.time() - start_time
+    time_taken: str = "{:.2f}".format(end_time)
     
-    if media.mime_type not in ("image/png", "image/jpeg"):
-        return None
-    
-    if hasattr(media, "document"):
-        file_id = media.document.file_id
-    elif hasattr(media, "sticker"):
-        if media.sticker.is_animated and not media.sticker.thumbs:
-            return None
-        file_id = media.sticker.thumbs[0].file_id if media.sticker.is_animated else media.sticker.file_id
-    elif hasattr(media, "photo"):
-        file_id = media.photo.file_id
-    elif hasattr(media, "animation") and media.animation.thumbs:
-        file_id = media.animation.thumbs[0].file_id
-    elif hasattr(media, "video") and media.video.thumbs:
-        file_id = media.video.thumbs[0].file_id
-    else:
-        return None
-    
-    return file_id
-
-
-# Command Handling
-@app.on_message(filters.text & filters.command(["pp", "grs", "reverse", "p", "po"]))
-async def _reverse(_, msg):
-    text = await msg.reply("**⇢ wait a sec...**")
-    file_id = await get_file_id_from_message(msg)
-    
-    if not file_id:
-        return await text.edit("**reply to media!**")
-    
-    await text.edit("**⇢ Requesting to Google....**")
-    result = await Sauce(BOT_TOKEN, file_id)
-    
-    if not result:
-        return await text.edit(f"**API DOWN : @{SUPPORT_CHAT}**")
-    
-    await text.edit('**Result ⇢** `{}`'.format(result['title']), disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Site", url=result['url'])]]))
+    text: str = STRINGS.RESULT.format(
+        query=query,
+        page_url=page_url,
+        time_taken=time_taken
+        )
+    buttons: List[List[InlineKeyboardButton]] = [
+        [InlineKeyboardButton(STRINGS.OPEN_PAGE, url=page_url)]
+        ]
+    await message.reply(text, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(buttons))
+    await status_msg.delete()
 
 """Bot is Started"""
 print("Bot has been Started!!!")

@@ -75,7 +75,7 @@ requestRegex = "#[rR][eE][qQ][uU][eE][sS][tT] "
 """Handlers""" 
 
 # Start Handler
-@app.on_message(filters.private & filters.command("start"))
+@app.on_message(filters.command("start"))
 async def start_handler(bot: Update, msg: Message):
     botInfo = await bot.get_me()
     await bot.send_photo(
@@ -96,7 +96,7 @@ async def start_handler(bot: Update, msg: Message):
     )
 
 # Help Handler
-@app.on_message(filters.private & filters.command("help"))
+@app.on_message(filters.command("help"))
 async def help_handler(bot: Update, msg: Message):
     help_message = """
     <b>Commands:</b>
